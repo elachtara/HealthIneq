@@ -31,26 +31,28 @@ devtools::install_github("elachtara/HealthIneq")
 ```
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+First you will load the package and call for the data. 
 
-```{r example}
+```{r Data read in}
 library(HealthIneq)
+library(dplyr)
 data(HealthIneq)
-summary(HealthIneq)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+Let's look at the life expectancy for males vs. females:
 
-```{r cars}
-summary(cars)
+```{r Life Expectancy}
+# Create average life expectancy across all counties
+HealthIneq  %>% 
+  summarize(male_avg = mean(avg_life_M), 
+            female_avg = mean(avg_life_F))
 ```
+Sorry fellas! Looks like females live on average over 3 years longer than males.
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date.
+Let's make a plot of these life expectancies.
 
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
+```{r Plot}
+plot(HealthIneq$avg_life_M, HealthIneq$avg_life_F, main = "Male vs. Female Life Expectancies",
+     xlab = "Male Life Expectancy (Years)", ylab = "Feale Life Expectancy (Years)")
 ```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub!
+Pretty neat, appears to be a linear relationship between male and female life expectancies across the counties of the United States. Check out the vingette for more examples on how to use the package.
