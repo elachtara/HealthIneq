@@ -36,7 +36,7 @@ First you will load the package and call for the data.
 ```{r Data read in}
 library(HealthIneq)
 library(dplyr)
-data(HealthIneq)
+data("HealthIneq")
 ```
 
 Let's look at the life expectancy for males vs. females:
@@ -44,15 +44,15 @@ Let's look at the life expectancy for males vs. females:
 ```{r Life Expectancy}
 # Create average life expectancy across all counties
 HealthIneq  %>% 
-  summarize(male_avg = mean(avg_life_M), 
-            female_avg = mean(avg_life_F))
+  summarize(male_avg = mean(avglifeM), 
+            female_avg = mean(avglifeF))
 ```
 Sorry fellas! Looks like females live on average over 3 years longer than males.
 
 Let's make a plot of these life expectancies.
 
 ```{r Plot}
-plot(HealthIneq$avg_life_M, HealthIneq$avg_life_F, main = "Male vs. Female Life Expectancies",
+plot(HealthIneq$avglifeM, HealthIneq$avglifeF, main = "Male vs. Female Life Expectancies",
      xlab = "Male Life Expectancy (Years)", ylab = "Feale Life Expectancy (Years)")
 ```
 Pretty neat, appears to be a linear relationship between male and female life expectancies across the counties of the United States. Check out the vingette for more examples on how to use the package.

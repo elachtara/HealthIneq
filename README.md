@@ -36,7 +36,7 @@ library(dplyr)
 #> The following objects are masked from 'package:base':
 #> 
 #>     intersect, setdiff, setequal, union
-data(HealthIneq)
+data("HealthIneq")
 ```
 
 Let’s look at the life expectancy for males vs. females:
@@ -44,8 +44,8 @@ Let’s look at the life expectancy for males vs. females:
 ``` r
 # Create average life expectancy across all counties
 HealthIneq  %>% 
-  summarize(male_avg = mean(avg_life_M), 
-            female_avg = mean(avg_life_F))
+  summarize(male_avg = mean(avglifeM), 
+            female_avg = mean(avglifeF))
 #> # A tibble: 1 x 2
 #>   male_avg female_avg
 #>      <dbl>      <dbl>
@@ -58,7 +58,7 @@ than males.
 Let’s make a plot of these life expectancies.
 
 ``` r
-plot(HealthIneq$avg_life_M, HealthIneq$avg_life_F, main = "Male vs. Female Life Expectancies",
+plot(HealthIneq$avglifeM, HealthIneq$avglifeF, main = "Male vs. Female Life Expectancies",
      xlab = "Male Life Expectancy (Years)", ylab = "Feale Life Expectancy (Years)")
 ```
 
