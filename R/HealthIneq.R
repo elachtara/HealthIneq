@@ -1,20 +1,20 @@
-#' Discs for Disc Golf
+#' Health Inequities
 #'
-#' This package contains specifications for discs approved by
-#' the Professional Disc Golf Association
+#' This package contains data on US counties
+#' pertaining to life expectancy.
 #' @docType package
 #' @name HealthIneq
-#' @aliases HealthIneq HealthIneq-package
+#' @aliases Health HealthIneq-package
 NULL
 
-#' "HealthIneq"
+#' "Health Inequities"
 #'
 #' A data set containing information on
 #' health inequities across the United
 #' States by county.
 #'
 #' @source \url{https://healthinequality.org/data/}
-#' @format A dataframe with 2600 elements
+#' @format A data frame with 2600 elements
 #' \describe{
 #'   \item{cz}{Commuting Zone ID}
 #'   \item{czname}{Commuting Zone Name}

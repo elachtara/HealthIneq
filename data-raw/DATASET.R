@@ -1,7 +1,4 @@
-library(readxl)
+
 # Load in data
-health_ineq <- readRDS(file = "data.rds")
-
-Codebook <- read_excel("Codebook.xlsx")
-
-usethis::use_data(health_ineq, CodebooK)
+HealthIneq <- readRDS(file = "data.rds")
+usethis::use_data(HealthIneq, overwrite = TRUE)
