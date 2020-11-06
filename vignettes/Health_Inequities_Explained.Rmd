@@ -1,0 +1,22 @@
+---
+title: "Health_Inequities_Explained"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Health_Inequities_Explained}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(HealthIneq)
+data(HealthIneq)
+```
+
+This vingette will be used to provide some examples of how to use the package.
