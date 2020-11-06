@@ -1,0 +1,17 @@
+Package: HealthIneq
+Title: Health Inequaties across US counties
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Emily",
+           family = "Lachtara",
+           role = c("aut", "cre"),
+           email = "elachtara21@amherst.edu",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: Explore the health inequities across different counties by investigating demographic, income, and the health status that impacts life expectancy.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Depends: 
+    R (>= 2.10)
