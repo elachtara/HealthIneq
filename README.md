@@ -4,6 +4,8 @@
 # HealthIneq
 
 <!-- badges: start -->
+
+![R-CMD-check](https://github.com/elachtara/HealthIneq/workflows/R-CMD-check/badge.svg)
 <!-- badges: end -->
 
 The goal of HealthIneq is to .shed light on the health inequities across
