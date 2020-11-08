@@ -18,6 +18,7 @@ library(dplyr)
 library(readxl)
 library(purrr)
 library(readr)
+library(leaps)
 library(maptools) # required for rgdal to work correctly
 library(tigris)
 library(acs)
@@ -30,7 +31,7 @@ knitr::opts_chunk$set(
 ```
 
 # $\color{cornflowerblue}{Setup~and~Goals}$
-This vingette will be used to provide some examples of how to use the 'HealthIneq' package. We hope the package will provide real insights into some of the health-income disparities in counties across the US and how these are manifested in terms of life expectancy.
+This vignette will be used to provide some examples of how to use the 'HealthIneq' package. We hope the package will provide real insights into some of the health-income disparities in counties across the US and how these are manifested in terms of life expectancy.
 
 ```{r Setup}
 library(HealthIneq)
@@ -59,8 +60,6 @@ HealthIneq  %>% group_by(statename) %>%
 ```
 
 
-
-
 # $\color{cornflowerblue}{Life~expectancy~by~income}$
 
 Use the 'HealthIneq' data frame to investigate income inequality using the 'gini99' variable and life expectancies by income bracket ('avglifeQ1' through 'Q4').
@@ -72,12 +71,12 @@ In NYC, New York the Gini99 score is 1.09 and 0.16 in Santa Fe, New Mexico.
 ```{r Gini 1, message = FALSE}
 # Highest Index
 high_gini <- HealthIneq  %>% 
-  arrange(desc(gini99)) %>% dplyr::select(czname, statename, gini99) %>% 
+  arrange(desc(gini99)) %>% select(czname, statename, gini99) %>% 
   head(1) 
 
 # Lowest Index
 low_gini <- HealthIneq  %>% 
-  arrange(desc(gini99)) %>% dplyr::select(czname, statename, gini99) %>% 
+  arrange(desc(gini99)) %>% select(czname, statename, gini99) %>% 
   na.omit() %>% tail(1)
 
 # Display two counties
@@ -93,7 +92,7 @@ gini_plot_data <- HealthIneq %>%
   arrange(desc(gini99)) %>%
   distinct(czname, .keep_all = TRUE) %>% # Remove duplicates for the same county
   filter(czname == 'New York City' | czname == 'Santa Fe') %>% 
-  dplyr::select(avglifeQ1, avglifeQ2, avglifeQ3, avglifeQ4, czname) %>%
+  select(avglifeQ1, avglifeQ2, avglifeQ3, avglifeQ4, czname) %>%
   gather("Quarter", value = "Value", avglifeQ1, avglifeQ2, avglifeQ3, avglifeQ4) %>%
   mutate(Quarter = parse_number(Quarter))
 
@@ -132,8 +131,8 @@ To decide which variables to use as predictors of 'avglifeall',  we implemented 
 ```{r Reg 1 , message = FALSE}
 # Only keep numeric variables
 healthnumeric <- HealthIneq %>% 
-  purrr::keep(is.numeric) %>% # remove non-numeric variables 
-  dplyr::select(-cz, -fips, -avglifeQ1, -avglifeQ2, # remove confounding average life variables
+  keep(is.numeric) %>% # remove non-numeric variables 
+  select(-cz, -fips, -avglifeQ1, -avglifeQ2, # remove confounding average life variables
          -avglifeQ3, -avglifeQ4, -avglifeM, -avglifeF)
 
 # Best subsets regression for 5 variables
@@ -151,7 +150,7 @@ selectedvars %>% as.data.frame() %>% rename('Variable' = '.') %>% kable()
 
 ### b) Create a visualization to show the relationship between each of the predictors and the outcome variable. Comment on what you observe.
 
-We see that house hold income (hhinc00), median house value (medianhousevalue), Percent Change in Labor Force 1980-2000 (fd20001980), and Social Capital Index (scapski90pcm) all have positive associations with average life expectancy. This makes sense with what we know about income health inequality; those who make more tend to live longer because they can afford better care. 	Medicare $ Per Enrollee (reimbpenrolladj10) had a strong negative association with average life expectancy, suggesting that in counties with lower dependcy on medicare, the standard of living is greater and life expectancy is longer.
+We see that house hold income (hhinc00), median house value (medianhousevalue), Percent Change in Labor Force 1980-2000 (fd20001980), and Social Capital Index (scapski90pcm) all have positive associations with average life expectancy. This makes sense with what we know about income health inequality; those who make more tend to live longer because they can afford better care. 	Medicare $ Per Enrollee (reimbpenrolladj10) had a strong negative association with average life expectancy, suggesting that in counties with lower dependency on medicare, the standard of living is greater and life expectancy is longer.
 
 ```{r Reg 2, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 5, fig.align='center'}
 # Filter data frame for selected variables

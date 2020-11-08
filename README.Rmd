@@ -47,7 +47,7 @@ HealthIneq  %>%
   summarize(male_avg = mean(avglifeM), 
             female_avg = mean(avglifeF))
 ```
-Sorry fellas! Looks like females live on average over 3 years longer than males.
+Looks like females live on average over 3 years longer than males.
 
 Let's make a plot of these life expectancies.
 
@@ -55,4 +55,4 @@ Let's make a plot of these life expectancies.
 plot(HealthIneq$avglifeM, HealthIneq$avglifeF, main = "Male vs. Female Life Expectancies",
      xlab = "Male Life Expectancy (Years)", ylab = "Feale Life Expectancy (Years)")
 ```
-Pretty neat, appears to be a linear relationship between male and female life expectancies across the counties of the United States. Check out the vingette for more examples on how to use the package.
+There appears to be a linear relationship between male and female life expectancies across the counties of the United States. Check out the vignette for more examples on how to use the package.

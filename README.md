@@ -52,8 +52,7 @@ HealthIneq  %>%
 #> 1     81.0       84.9
 ```
 
-Sorry fellas! Looks like females live on average over 3 years longer
-than males.
+Looks like females live on average over 3 years longer than males.
 
 Let’s make a plot of these life expectancies.
 
@@ -62,7 +61,7 @@ plot(HealthIneq$avglifeM, HealthIneq$avglifeF, main = "Male vs. Female Life Expe
      xlab = "Male Life Expectancy (Years)", ylab = "Feale Life Expectancy (Years)")
 ```
 
-<img src="man/figures/README-Plot-1.png" width="100%" /> Pretty neat,
-appears to be a linear relationship between male and female life
-expectancies across the counties of the United States. Check out the
-vingette for more examples on how to use the package.
+<img src="man/figures/README-Plot-1.png" width="100%" /> There appears
+to be a linear relationship between male and female life expectencies
+across the counties of the United States. Check out the vingette for
+more examples on how to use the package.

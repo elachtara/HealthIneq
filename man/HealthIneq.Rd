@@ -7,7 +7,7 @@
 \alias{HealthIneq-package}
 \title{Health Inequities}
 \format{
-A data frame with 2600 elements
+Codebook Descriptions:
 \describe{
 \item{cz}{Commuting Zone ID}
 \item{czname}{Commuting Zone Name}
