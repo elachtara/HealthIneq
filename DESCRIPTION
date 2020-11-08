@@ -1,5 +1,5 @@
 Package: HealthIneq
-Title: Health Inequaties across US counties
+Title: Health Inequities
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Emily",
@@ -7,7 +7,7 @@ Authors@R:
            role = c("aut", "cre"),
            email = "elachtara21@amherst.edu",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: Explore the health inequities across different counties by investigating demographic, income, and the health status that impacts life expectancy.
+Description: Explore the health-income disparities in counties across the US and how these are manifested in terms of life expectancy.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

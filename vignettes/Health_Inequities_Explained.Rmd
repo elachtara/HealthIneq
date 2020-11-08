@@ -1,5 +1,5 @@
 ---
-title: "Health_Inequities_Explained"
+title: "How to use the HealthIneq package"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Health_Inequities_Explained}
@@ -8,15 +8,219 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+library(mosaic)   # Load additional packages here 
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(caret)
+library(leaps)
+library(dplyr)
+library(readxl)
+library(purrr)
+library(readr)
+library(maptools) # required for rgdal to work correctly
+library(tigris)
+library(acs)
+library(stringr) # to pad FIPS codes
+library(leaflet)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-```{r setup}
+# $\color{cornflowerblue}{Setup~and~Goals}$
+This vingette will be used to provide some examples of how to use the 'HealthIneq' package. We hope the package will provide real insights into some of the health-income disparities in counties across the US and how these are manifested in terms of life expectancy.
+
+```{r Setup}
 library(HealthIneq)
 data(HealthIneq)
 ```
 
-This vingette will be used to provide some examples of how to use the package.
+
+# $\color{cornflowerblue}{Life~expectancy~by~sex}$
+Use the 'HealthIneq' data frame to identify every state where women ('avglifeF') have an overall greater life span expectancy then men ('avglifeM'). 
+
+### a. How many states meet this criteria?  
+
+In all 50 states, Women on average live longer then men.
+
+### b. In which state is the difference in average life spans between men and women the greatest? 
+In Alabama, women live on average 4.62 years longer then men. Women tend to live 84.65 years where men only live 80.03 years. 
+
+```{r Sex Differences , message = FALSE}
+# Lets take a look at the data
+HealthIneq  %>% group_by(statename) %>% 
+  summarize(maleavg = mean(avglifeM), femaleavg = mean(avglifeF)) %>%
+  mutate(greater_le = ifelse(maleavg >= femaleavg, 'Male', 'Female')) %>%
+  mutate(difference_le = femaleavg - maleavg) %>%
+  arrange(desc(difference_le)) %>%
+  head(5)
+```
+
+
+
+
+# $\color{cornflowerblue}{Life~expectancy~by~income}$
+
+Use the 'HealthIneq' data frame to investigate income inequality using the 'gini99' variable and life expectancies by income bracket ('avglifeQ1' through 'Q4').
+
+### a) Which county has the highest and which has lowest Gini index (measure of income distribution amongst the bottom 99%)?
+
+In NYC, New York the Gini99 score is 1.09 and 0.16 in Santa Fe, New Mexico. 
+
+```{r Gini 1, message = FALSE}
+# Highest Index
+high_gini <- HealthIneq  %>% 
+  arrange(desc(gini99)) %>% dplyr::select(czname, statename, gini99) %>% 
+  head(1) 
+
+# Lowest Index
+low_gini <- HealthIneq  %>% 
+  arrange(desc(gini99)) %>% dplyr::select(czname, statename, gini99) %>% 
+  na.omit() %>% tail(1)
+
+# Display two counties
+rbind(high_gini,low_gini) %>% kable() %>%
+  kable_styling(latex_options = c("striped", "HOLD_position"))
+```
+
+### b) Create a plot of the life expectancies by income quartile for the two counties found in a. Comment on the relationship.
+
+```{r Gini 2 , message = FALSE, fig.width = 6, fig.height = 4, fig.align='center'}
+# Create data for plot
+gini_plot_data <- HealthIneq %>% 
+  arrange(desc(gini99)) %>%
+  distinct(czname, .keep_all = TRUE) %>% # Remove duplicates for the same county
+  filter(czname == 'New York City' | czname == 'Santa Fe') %>% 
+  dplyr::select(avglifeQ1, avglifeQ2, avglifeQ3, avglifeQ4, czname) %>%
+  gather("Quarter", value = "Value", avglifeQ1, avglifeQ2, avglifeQ3, avglifeQ4) %>%
+  mutate(Quarter = parse_number(Quarter))
+
+# Plot for b
+ggplot(gini_plot_data, aes(x = as.factor(Quarter), y = Value, fill = as.factor(czname)))+
+  geom_col(position = "dodge")+
+  theme_minimal()+
+  facet_wrap(~as.factor(czname))+
+  coord_cartesian(ylim=c(80,88))+
+  scale_fill_brewer(palette = 16)+
+  labs(title = "Life Expectancy by Income Quartile",
+       fill = "County",
+       y = "Average Life Expectancy",
+       x = "Income Quartile")+
+    theme(plot.title = element_text(hjust = 0.5, size = 13, face = "bold"),
+        axis.title.x = element_text(size = 12, face = "bold"),
+        axis.title.y = element_text(size = 12, face = "bold"),
+        axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        legend.position = "bottom")
+```
+
+A higher Gini index indicates a greater social inequality amongst income. Since the Gini score for New York City (1.09) is substantially higher than Santa Fe's (0.16), we have reason to believe the social inequality due to income is greater. From this, we might hypothesize that the average life expectancy across the four income quartiles in New York City will be more different than those in Santa Fe. We see that in both counties, the average life expectancy is different across the quantiles, with 1 (the bottom 25%) having the lowest and 4 (the top 25%) having the highest. We do see that the jump between the 3rd in the 4th quantile in New York city is rather large compared to the difference observed in Santa Fe. This may be the a product of the gini index social inequality, but there are many other factors that could be at play here.
+
+
+
+
+# $\color{cornflowerblue}{Regression~modeling}$
+
+Use the 'HealthIneq' data frame to try and predict 'avglifeall' for each county ('czname') using no more than 5 characteristics.
+
+### a) Which characteristics did you select and why?
+
+To decide which variables to use as predictors of 'avglifeall',  we implemented the best subsets method. By setting the parameters to "nvmax = 5" and "method = exhaustive", we use both forward and backwards selection to decide on the 5 best predictors of 'avglifeall'. The algorithm returned the following five variables:
+
+```{r Reg 1 , message = FALSE}
+# Only keep numeric variables
+healthnumeric <- HealthIneq %>% 
+  purrr::keep(is.numeric) %>% # remove non-numeric variables 
+  dplyr::select(-cz, -fips, -avglifeQ1, -avglifeQ2, # remove confounding average life variables
+         -avglifeQ3, -avglifeQ4, -avglifeM, -avglifeF)
+
+# Best subsets regression for 5 variables
+models <- regsubsets(avglifeall ~ ., data = na.omit(healthnumeric), 
+                     nvmax = 5, method = "exhaustive", really.big = TRUE) # set parameters for function
+
+# Which variables are selected (don't print)
+#summary(models)
+selectedvars <- c('reimbpenrolladj10', 'scapski90pcm', 
+                   'hhinc00', 'medianhousevalue', 'lfd20001980')
+
+# Display Variables
+selectedvars %>% as.data.frame() %>% rename('Variable' = '.') %>% kable() 
+```
+
+### b) Create a visualization to show the relationship between each of the predictors and the outcome variable. Comment on what you observe.
+
+We see that house hold income (hhinc00), median house value (medianhousevalue), Percent Change in Labor Force 1980-2000 (fd20001980), and Social Capital Index (scapski90pcm) all have positive associations with average life expectancy. This makes sense with what we know about income health inequality; those who make more tend to live longer because they can afford better care. 	Medicare $ Per Enrollee (reimbpenrolladj10) had a strong negative association with average life expectancy, suggesting that in counties with lower dependcy on medicare, the standard of living is greater and life expectancy is longer.
+
+```{r Reg 2, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 5, fig.align='center'}
+# Filter data frame for selected variables
+top5 <- HealthIneq[, colnames(HealthIneq) %in% selectedvars 
+                    | colnames(HealthIneq) == 'avglifeall']
+
+# Gather for ggplot format
+top5 %>% gather(key = "Predictor", value = "Value", -avglifeall) %>% 
+  ggplot(aes(x = log(Value), y = avglifeall, col = Predictor))+
+  geom_point()+
+  geom_smooth(method = "lm", se = FALSE, col = "grey20", alpha = 0.7)+
+  facet_wrap(~Predictor, scales = "free") +
+  theme_minimal()+ 
+  scale_colour_brewer(palette = 16)+
+  labs(title = "Life Expectancy as predicted by Top 5 Variables",
+       y = "Average Life Expectancy",
+       x = "Log(Predictor)")+
+    theme(plot.title = element_text(hjust = 0.5, size = 13, face = "bold"),
+        axis.title.x = element_text(size = 12, face = "bold"),
+        axis.title.y = element_text(size = 12, face = "bold"),
+        axis.text.x = element_text(size = 10),
+        axis.text.y = element_text(size = 10),
+        legend.position = "none")
+```
+
+
+
+
+# $\color{cornflowerblue}{Geospatial~visualization}$
+
+Use the 'HealthIneq' data frame to show the life expectancy 'avglifeall' for each state using a map!
+
+```{r State setup, results = "hide"}
+# Download the state data
+states <- states(cb=T)
+```
+
+```{r Geospatial, message = FALSE, warning = FALSE, fig.width = 6, fig.height = 6, fig.align='center'}
+# Group by state, get summary
+health_states <- HealthIneq  %>% group_by(stateabbrv) %>% 
+  summarize(meanlife = round(mean(avglifeall), 2),
+            meanq1 = round(mean(avglifeQ1), 2),
+            meanq2 = round(mean(avglifeQ2), 2),
+            meanq3 = round(mean(avglifeQ3), 2),
+            meanq4 = round(mean(avglifeQ4), 2))
+
+# Merge state files with characteristics
+states_merged_sb <- geo_join(states, health_states, "STUSPS", "stateabbrv")
+states_merged <- subset(states_merged_sb, !is.na(meanlife))
+
+# Color Palette
+pal <- colorNumeric("Blues", domain = states_merged$meanlife)
+
+# Set up and print Map
+leaflet() %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  setView(-98.483330, 38.712046, zoom = 3.5) %>% 
+  addPolygons(data = states_merged, 
+              fillColor = ~pal(states_merged$meanlife), 
+              fillOpacity = 0.7, 
+              weight = 0.2, 
+              smoothFactor = 0.2, 
+              popup = paste("Avg Life Expectancy:", states_merged$meanlife, "<br>",
+                           "Q1:", states_merged$meanq1, "<br>",
+                           "Q2:", states_merged$meanq2, "<br>",
+                           "Q3:", states_merged$meanq3, "<br>",
+                           "Q4:", states_merged$meanq4)) %>%
+  addLegend(pal = pal, 
+            values = states_merged$meanlife, 
+            position = "bottomright", 
+            title = "Average Life Expectancy")
+```
