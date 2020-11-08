@@ -156,7 +156,7 @@ top5 <- HealthIneq[, colnames(HealthIneq) %in% selectedvars
 
 # Gather for ggplot format
 top5 %>% gather(key = "Predictor", value = "Value", -avglifeall) %>% 
-  ggplot(aes(x = log(Value), y = avglifeall, col = Predictor))+
+  ggplot(aes(x = Value, y = avglifeall, col = Predictor))+
   geom_point()+
   geom_smooth(method = "lm", se = FALSE, col = "grey20", alpha = 0.7)+
   facet_wrap(~Predictor, scales = "free") +
