@@ -27,7 +27,7 @@ Suggests:
     leaflet,
     leaps,
     maptools,
-    purr,
+    purrr,
     readr,
     readxl,
     stringr,
