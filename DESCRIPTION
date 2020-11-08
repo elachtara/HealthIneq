@@ -19,5 +19,18 @@ URL: https://github.com/elachtara/HealthIneq
 BugReports: https://github.com/elachtara/HealthIneq/issues
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    acs,
+    caret,
+    dplyr,
+    kableExtra,
+    leaflet,
+    leaps,
+    maptools,
+    purr,
+    readr,
+    readxl,
+    stringr,
+    tidyverse,
+    tigris
 VignetteBuilder: knitr

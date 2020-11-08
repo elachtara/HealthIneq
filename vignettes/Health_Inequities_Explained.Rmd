@@ -8,22 +8,19 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-library(mosaic)   # Load additional packages here 
-library(tidyverse)
-library(knitr)
-library(kableExtra)
+library(acs)
 library(caret)
-library(leaps)
 library(dplyr)
-library(readxl)
+library(kableExtra)
+library(leaflet)
+library(leaps)
+library(maptools)
 library(purrr)
 library(readr)
-library(leaps)
-library(maptools) # required for rgdal to work correctly
+library(readxl)
+library(stringr)
+library(tidyverse)
 library(tigris)
-library(acs)
-library(stringr) # to pad FIPS codes
-library(leaflet)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
