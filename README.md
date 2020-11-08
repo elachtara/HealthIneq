@@ -8,7 +8,7 @@
 ![R-CMD-check](https://github.com/elachtara/HealthIneq/workflows/R-CMD-check/badge.svg)
 <!-- badges: end -->
 
-The goal of HealthIneq is to .shed light on the health inequities across
+The goal of HealthIneq is to shed light on the health inequities across
 the United States.
 
 ## Installation
@@ -62,6 +62,6 @@ plot(HealthIneq$avglifeM, HealthIneq$avglifeF, main = "Male vs. Female Life Expe
 ```
 
 <img src="man/figures/README-Plot-1.png" width="100%" /> There appears
-to be a linear relationship between male and female life expectencies
-across the counties of the United States. Check out the vingette for
+to be a linear relationship between male and female life expectancies
+across the counties of the United States. Check out the vignette for
 more examples on how to use the package.
