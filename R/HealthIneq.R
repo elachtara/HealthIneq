@@ -14,7 +14,7 @@ NULL
 #' States by county.
 #'
 #' @source \url{https://healthinequality.org/data/}
-#' @format A data frame with 2600 elements
+#' @format Codebook Descriptions:
 #' \describe{
 #'   \item{cz}{Commuting Zone ID}
 #'   \item{czname}{Commuting Zone Name}
